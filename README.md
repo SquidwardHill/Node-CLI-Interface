@@ -1,6 +1,9 @@
 # liri-node-app
 Georgia Tech course work- Language interpretation and recognition interface
 
+>>updated NPM 7/24
+5.6.0 → 6.2.0    npm i npm
+
    * [Twitter](https://www.npmjs.com/package/twitter)
    
    * [Node-Spotify-API](https://www.npmjs.com/package/node-spotify-api)

@@ -15,4 +15,4 @@ exports.spotify = {
 module.exports = {
     spotify : spotify,
     twitter: twitter
-}
+};
