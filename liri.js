@@ -41,11 +41,18 @@ switch(liriFunc){
 //Twitter API call (retrieve 20 most recent tweets)
 function twitterCall(){
   console.log('starting liri twitter command');
-//client.get(path, params, callback);
-//POST statuses/update
-client.get('statuses/user_timeline', params, function(error, tweets, response) {
+  client.get('statuses/user_timeline', function(error, tweets, response) {
     if (!error) {
-      console.log(tweets);
+     var tweetsArr = [];
+      for(var i = 0; i < tweets.length; i++){
+       tweetsArr.push(tweets[i].text);
+    };
+    tweetsArr.reverse();
+    var counter = 0;
+    for(var i = 0; i < tweetsArr.length; i++) {
+      counter++;
+      console.log(`Tweet #${counter}: "${tweetsArr[i]}"`);
+    }
     }
   });
 }
