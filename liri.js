@@ -17,7 +17,7 @@ var search = "";
 for(var i = 3; i < liriCommand.length; i++){
     search = search + ' ' + liriCommand[i];
 };
-console.log(search);
+//console.log(search);
 
 //listen for liri command to choose which function to run
 switch(liriFunc){
@@ -40,7 +40,7 @@ switch(liriFunc){
 
 //Twitter API call (retrieve 20 most recent tweets)
 function twitterCall(){
-  console.log('starting liri twitter command');
+  //console.log('starting liri twitter command');
   client.get('statuses/user_timeline', function(error, tweets, response) {
     if (!error) {
      var tweetsArr = [];
@@ -56,38 +56,46 @@ function twitterCall(){
     }
   });
 }
-
-// default to "The Sign" by Ace of Base for no song
 function spotifyCall(search) {
-  console.log('starting liri spotify command');
+  //spotify-this-song
+  //console.log('starting liri spotify command');
   spotify.search({ type: 'track', query: search, limit: 1 }, function(err, data) {
     if (err) {
-      return console.log('Error occurred: ' + err);
+      console.log(`Sorry, we can't find a song by the name of "${search}", give this a try?`)
+      spotifyCall('The Sign');
     }
-  var songName = search;
-  var artist = data.tracks.items[0].artists[0].name;
-  var album = data.tracks.items[0].album.name;
-  var songURL = data.tracks.items[0].external_urls.spotify;
-
-  console.log(`Song Name: ${songName}, Artist: ${artist}, Album: ${album}, Listen: ${songURL}`);
-
+    else {
+      var songName = search;
+      var artist = data.tracks.items[0].artists[0].name;
+      var album = data.tracks.items[0].album.name;
+      var songURL = data.tracks.items[0].external_urls.spotify;
+console.log(`
+Song Name: ${songName}, 
+Artist: ${artist}, 
+Album: ${album}, 
+Listen: ${songURL}`);
+    }
+ 
   });
 }
 
 function omdbCall(search){  
   var request = require('request');
   request(`http://www.omdbapi.com/?apikey=trilogy&t=${search}`, function (error, response, body) {
-  console.log('error:', error);
-  //console.log('statusCode:', response && response.statusCode);
   var movie = JSON.parse(body);
-  var title = movie.Title;
-        var year = movie.Year;
-        var ratingIMDB =  movie.imdbRating;
-        var ratingRT = movie.Ratings[1].Value;
-        var country = movie.Country;
-        var language = movie.Language;
-        var plot = movie.Plot;
-        var actors = movie.Actors;
+  var APIresponse = movie.Response;
+  if (APIresponse === "False"){
+    omdbCall('Mr.Nobody');
+  }
+  else {
+    var title = movie.Title;
+    var year = movie.Year;
+    var ratingIMDB =  movie.imdbRating;
+    var ratingRT = movie.Ratings[1].Value;
+    var country = movie.Country;
+    var language = movie.Language;
+    var plot = movie.Plot;
+    var actors = movie.Actors;
 
 console.log(`
 Movie Title: ${title},
@@ -99,6 +107,8 @@ Language: ${language},
 Plot: ${plot}, 
 Actors: ${actors}
 `);
+  }
+   
 });
 
 
@@ -106,8 +116,34 @@ Actors: ${actors}
 }
 
 function fsCommand (){
-  console.log('starting liri fs command');
-//Using the `fs` Node package, LIRI will take the text inside of random.txt and then use it to call one of LIRI's commands.
-// It should run `spotify-this-song` for "I Want it That Way," as follows the text in `random.txt`.
-// Feel free to change the text in that document to test out the feature for other commands.
+  //console.log('starting liri fs command');
+  fs.readFile("random.txt", "utf8", function(error, data) {
+    if (error) {
+      return console.log(error);
+    }
+  
+    var dataArr = data.split(",");
+    liriFunc = dataArr[0];
+    search = dataArr[1].replace(/\"/g, '');
+    console.log(dataArr);
+    
+    //lazy copying this whole switch statement for now, will make better
+    switch(liriFunc){
+      case 'my-tweets':
+      twitterCall();
+      break;
+  
+      case 'spotify-this-song':
+      spotifyCall(search);
+      break;
+  
+      case 'movie-this':
+      omdbCall(search);
+      break;
+  
+      case 'do-what-it-says':
+      fsCommand(search);
+      break;
+  }
+  });
 }
