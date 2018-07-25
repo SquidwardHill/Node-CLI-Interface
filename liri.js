@@ -3,11 +3,13 @@ var keys =  require("./keys.js");
 var fs = require("fs");
 var Spotify = require('node-spotify-api');
 var Twitter = require('twitter');
+var omdb = require("omdb");
+var request = require("request");
 
 
 var spotify = new Spotify(keys.spotify);
 var client = new Twitter(keys.twitter);
-var omdb = "http://www.omdbapi.com/?apikey=trilogy&";
+var OMDBquery = "http://www.omdbapi.com/?apikey=trilogy&";
 
 var liriCommand = process.argv;
 var liriFunc = liriCommand[2];
@@ -47,33 +49,52 @@ client.get('statuses/user_timeline', params, function(error, tweets, response) {
     }
   });
 }
-//Artist(s)
-//The song's name
-//A preview link of the song from Spotify
-//The album that the song is from
+
 // default to "The Sign" by Ace of Base for no song
 function spotifyCall(search) {
   console.log('starting liri spotify command');
-  spotify.search({ type: 'track', query: search }, function(err, data) {
+  spotify.search({ type: 'track', query: search, limit: 1 }, function(err, data) {
     if (err) {
       return console.log('Error occurred: ' + err);
     }
-  
-  //console.log(data); 
-  console.log(data.tracks.items[0]);
+  var songName = search;
+  var artist = data.tracks.items[0].artists[0].name;
+  var album = data.tracks.items[0].album.name;
+  var songURL = data.tracks.items[0].external_urls.spotify;
+
+  console.log(`Song Name: ${songName}, Artist: ${artist}, Album: ${album}, Listen: ${songURL}`);
+
   });
 }
 
-function omdbCall(){  
-  console.log('starting liri OMDB command');
-//Title of the movie.
-//Year the movie came out.
-// IMDB Rating of the movie.
-//Rotten Tomatoes Rating of the movie.
-//Country where the movie was produced.
-//Language of the movie.
-//Plot of the movie.
-//Actors in the movie.
+function omdbCall(search){  
+  var request = require('request');
+  request(`http://www.omdbapi.com/?apikey=trilogy&t=${search}`, function (error, response, body) {
+  console.log('error:', error);
+  //console.log('statusCode:', response && response.statusCode);
+  var movie = JSON.parse(body);
+  var title = movie.Title;
+        var year = movie.Year;
+        var ratingIMDB =  movie.imdbRating;
+        var ratingRT = movie.Ratings[1].Value;
+        var country = movie.Country;
+        var language = movie.Language;
+        var plot = movie.Plot;
+        var actors = movie.Actors;
+
+console.log(`
+Movie Title: ${title},
+Year: ${year},
+IMDB Rating: ${ratingIMDB}, 
+Rotten Tomatoes Score: ${ratingRT}, 
+Country produced in: ${country}, 
+Language: ${language}, 
+Plot: ${plot}, 
+Actors: ${actors}
+`);
+});
+
+
 //nothing typed default to  output data for the movie 'Mr. Nobody.
 }
 
