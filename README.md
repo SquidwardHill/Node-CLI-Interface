@@ -12,7 +12,7 @@ Commands are:
 `do-what-it-says`
 
 To use, type:
-node liri.js <command> '<search term>'
+`node liri.js` + `command` + `'search term'`
 
 _for example:_
 `node liri.js spotify-this-song 'Naive Melody'`
